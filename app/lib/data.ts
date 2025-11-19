@@ -9,23 +9,19 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
-/* ========================================================
-   DATABASE CONNECTION (WORKS LOCALLY + VERCEL + NEON)
-======================================================== */
+
 if (!process.env.POSTGRES_URL) {
   throw new Error('POSTGRES_URL is not set in environment variables.');
 }
 
 export const sql = postgres(process.env.POSTGRES_URL!, {
   ssl: {
-    rejectUnauthorized: false, // required for Neon serverless
+    rejectUnauthorized: false, 
   },
-  max: 10, // optional: max connection pool size
+  max: 10, 
 });
 
-/* ========================================================
-   FETCH REVENUE
-======================================================== */
+
 export async function fetchRevenue() {
   try {
     const data = await sql<Revenue[]>`
@@ -38,9 +34,7 @@ export async function fetchRevenue() {
   }
 }
 
-/* ========================================================
-   FETCH LATEST INVOICES (TOP 5)
-======================================================== */
+
 export async function fetchLatestInvoices() {
   try {
     const rows = await sql<LatestInvoiceRaw[]>`
@@ -61,9 +55,7 @@ export async function fetchLatestInvoices() {
   }
 }
 
-/* ========================================================
-   FETCH DASHBOARD CARD DATA
-======================================================== */
+
 export async function fetchCardData() {
   try {
     const [invoiceCount, customerCount, totals] = await Promise.all([
@@ -94,9 +86,7 @@ export async function fetchCardData() {
   }
 }
 
-/* ========================================================
-   PAGINATION FOR INVOICE LIST
-======================================================== */
+
 const ITEMS_PER_PAGE = 6;
 
 export async function fetchFilteredInvoices(query: string, currentPage: number) {
@@ -143,9 +133,7 @@ export async function fetchInvoicesPages(query: string) {
   }
 }
 
-/* ========================================================
-   FETCH INVOICE BY ID
-======================================================== */
+
 export async function fetchInvoiceById(id: string) {
   try {
     const rows = await sql<InvoiceForm[]>`
@@ -157,7 +145,7 @@ export async function fetchInvoiceById(id: string) {
 
     return {
       ...rows[0],
-      amount: rows[0].amount / 100, // convert cents → currency
+      amount: rows[0].amount / 100, 
     };
   } catch (error) {
     console.error('Database Error (fetchInvoiceById):', error);
@@ -165,9 +153,7 @@ export async function fetchInvoiceById(id: string) {
   }
 }
 
-/* ========================================================
-   FETCH CUSTOMERS
-======================================================== */
+
 export async function fetchCustomers() {
   try {
     return await sql<CustomerField[]>`
@@ -181,9 +167,6 @@ export async function fetchCustomers() {
   }
 }
 
-/* ========================================================
-   FILTER CUSTOMER TABLE
-======================================================== */
 export async function fetchFilteredCustomers(query: string) {
   try {
     const rows = await sql<CustomersTableType[]>`
